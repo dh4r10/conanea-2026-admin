@@ -51,7 +51,7 @@ const Login = () => {
               </span>
             </div>
             <img
-              src='/img/sigepo_sin_fondo.png'
+              src='/img/logo_sin_fondo.webp'
               alt='Logo SIGEPO'
               className='w-40'
             />
