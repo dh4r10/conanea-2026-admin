@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
     const success = await login(form.username, form.password);
     if (success) {
-      navigate('/admin');
+      navigate('/');
     } else {
       // Toast.error('Credenciales incorrectas');
       alert('Credenciales incorrectas');

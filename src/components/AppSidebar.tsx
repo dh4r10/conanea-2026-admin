@@ -58,7 +58,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link to='/admin'>
+              <Link to='/'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <LayoutDashboard className='w-4 h-4' />
                   <span>Inicio</span>
@@ -74,7 +74,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link to='/admin/activity'>
+              <Link to='/activity'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <ActivityIcon className='w-4 h-4' />
                   <span>Actividades</span>
@@ -83,7 +83,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
 
             <SidebarMenuItem>
-              <Link to='/admin/activity-type'>
+              <Link to='/activity-type'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <Brackets className='w-4 h-4' />
                   <span>Tipo de Actividad</span>
@@ -92,7 +92,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
 
             <SidebarMenuItem>
-              <Link to='/admin/days'>
+              <Link to='/day'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <CalendarDays className='w-4 h-4' />
 
@@ -109,7 +109,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link to='/admin/speaker'>
+              <Link to='/speaker'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <Mic2 className='w-4 h-4' />
                   <span>Speakers</span>
