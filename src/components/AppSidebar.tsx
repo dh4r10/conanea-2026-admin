@@ -44,7 +44,7 @@ export function AppSidebar() {
       {/* HEADER */}
       <SidebarHeader className='flex flex-col items-center  gap-1 py-4 bg-[#111] border-b border-white/10'>
         <img
-          src='/img/sigepo_sin_fondo.png'
+          src='/img/logo_sin_fondo.webp'
           alt='SIGEPO'
           className='w-36 px-2'
         />
