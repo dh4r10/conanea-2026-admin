@@ -11,14 +11,18 @@ type SpeakerStore = {
   createSpeaker: (payload: FormData) => Promise<void>; // 👈 FormData
   updateSpeaker: (id: number, payload: FormData) => Promise<void>; // 👈 FormData
   removeSpeaker: (id: number) => Promise<void>;
+  invalidateSpeaker: () => Promise<void>;
 };
 
-export const useSpeakerStore = create<SpeakerStore>((set) => ({
+export const useSpeakerStore = create<SpeakerStore>((set, get) => ({
   speakers: [],
   loading: false,
   error: null,
 
   fetchSpeakers: async () => {
+    const { speakers } = get();
+    if (speakers.length > 0) return;
+
     set({ loading: true, error: null });
     try {
       const speakers = await speakerService.getAll();
@@ -61,5 +65,10 @@ export const useSpeakerStore = create<SpeakerStore>((set) => ({
     } catch {
       throw new Error('Error al eliminar el speaker');
     }
+  },
+
+  invalidateSpeaker: async () => {
+    set({ speakers: [] });
+    await get().fetchSpeakers();
   },
 }));

@@ -39,6 +39,10 @@ const Activity = () => {
     number | undefined
   >(undefined);
 
+  const [selectedSpeakerId, setSelectedSpeakerId] = useState<
+    number | undefined
+  >(undefined);
+
   // --- Modal Eliminar ---
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<Row | null>(null);
@@ -120,9 +124,10 @@ const Activity = () => {
       fetchActivities({
         day_id: selectedDayId,
         activity_type_id: selectedActivityTypeId,
+        speaker_id: selectedSpeakerId,
       });
     }
-  }, [selectedDayId, selectedActivityTypeId]);
+  }, [selectedDayId, selectedActivityTypeId, selectedSpeakerId]);
 
   const filtered = activities.filter((a) =>
     a.name.toLowerCase().includes(search.toLowerCase()),
@@ -187,6 +192,8 @@ const Activity = () => {
               selectedActivityTypeId={selectedActivityTypeId}
               onDayChange={setSelectedDayId}
               onActivityTypeChange={setSelectedActivityTypeId}
+              selectedSpeakerId={selectedSpeakerId}
+              onSpeakerChange={setSelectedSpeakerId}
             />
           </div>
           <SearchPanel

@@ -16,14 +16,17 @@ type ActivityTypeStore = {
     payload: Partial<ActivityTypePayload>,
   ) => Promise<void>;
   removeActivityType: (id: number) => Promise<void>;
+  invalidateActivityTypes: () => Promise<void>;
 };
 
-export const useActivityTypeStore = create<ActivityTypeStore>((set) => ({
+export const useActivityTypeStore = create<ActivityTypeStore>((set, get) => ({
   activityTypes: [],
   loading: false,
   error: null,
 
   fetchActivityTypes: async () => {
+    const { activityTypes } = get();
+    if (activityTypes.length > 0) return;
     set({ loading: true, error: null });
     try {
       const activityTypes = await activityTypeService.getAll();
@@ -41,6 +44,7 @@ export const useActivityTypeStore = create<ActivityTypeStore>((set) => ({
       set((state) => ({
         activityTypes: [...state.activityTypes, newActivityType],
       }));
+      get().invalidateActivityTypes();
     } catch {
       throw new Error('Error al crear el tipo de actividad');
     }
@@ -54,6 +58,7 @@ export const useActivityTypeStore = create<ActivityTypeStore>((set) => ({
           at.id === id ? updated : at,
         ),
       }));
+      get().invalidateActivityTypes();
     } catch {
       throw new Error('Error al actualizar el tipo de actividad');
     }
@@ -65,8 +70,14 @@ export const useActivityTypeStore = create<ActivityTypeStore>((set) => ({
       set((state) => ({
         activityTypes: state.activityTypes.filter((at) => at.id !== id),
       }));
+      get().invalidateActivityTypes();
     } catch {
       throw new Error('Error al eliminar el tipo de actividad');
     }
+  },
+
+  invalidateActivityTypes: async () => {
+    set({ activityTypes: [] });
+    await get().fetchActivityTypes();
   },
 }));

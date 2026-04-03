@@ -8,26 +8,33 @@ import {
 import { useEffect } from 'react';
 import { useDayStore } from '@/store/useDayStore';
 import { useActivityTypeStore } from '@/store/useActivityTypeStore';
+import { useSpeakerStore } from '@/store/useSpeakerStore';
 
 interface ActivityFiltersProps {
   selectedDayId: number | undefined;
   selectedActivityTypeId: number | undefined;
+  selectedSpeakerId: number | undefined;
   onDayChange: (id: number | undefined) => void;
   onActivityTypeChange: (id: number | undefined) => void;
+  onSpeakerChange: (id: number | undefined) => void;
 }
 
 const ActivityFilters = ({
   selectedDayId,
   selectedActivityTypeId,
+  selectedSpeakerId,
   onDayChange,
   onActivityTypeChange,
+  onSpeakerChange,
 }: ActivityFiltersProps) => {
   const { days, fetchDays } = useDayStore();
   const { activityTypes, fetchActivityTypes } = useActivityTypeStore();
+  const { speakers, fetchSpeakers } = useSpeakerStore();
 
   useEffect(() => {
     fetchDays();
     fetchActivityTypes();
+    fetchSpeakers();
   }, []);
 
   useEffect(() => {
@@ -81,6 +88,34 @@ const ActivityFilters = ({
               className='focus:bg-white/5 focus:text-slate-100'
             >
               {type.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={selectedSpeakerId?.toString() ?? 'all'}
+        onValueChange={(val) =>
+          onSpeakerChange(val === 'all' ? undefined : Number(val))
+        }
+      >
+        <SelectTrigger className='w-52 bg-[#111] border-white/10 text-slate-200 focus:ring-[#fbba0e] focus:ring-offset-0 text-sm'>
+          <SelectValue placeholder='Filtrar por speaker' />
+        </SelectTrigger>
+        <SelectContent className='bg-[#1a1a1a] border-white/10 text-slate-200'>
+          <SelectItem
+            value='all'
+            className='focus:bg-white/5 focus:text-slate-100'
+          >
+            Todos los speakers
+          </SelectItem>
+          {speakers.map((speaker) => (
+            <SelectItem
+              key={speaker.id}
+              value={speaker.id.toString()}
+              className='focus:bg-white/5 focus:text-slate-100'
+            >
+              {speaker.name}
             </SelectItem>
           ))}
         </SelectContent>

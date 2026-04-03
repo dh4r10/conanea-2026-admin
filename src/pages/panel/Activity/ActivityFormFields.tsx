@@ -37,44 +37,45 @@ const ActivityFormFields = ({
         type='text'
       />
 
-      {/* Días */}
-      <FormSelect
-        label='Día'
-        value={form.day}
-        onValueChange={(val) => onSelectChange('day', val)}
-        options={days.map((d) => ({
-          label: d.title,
-          value: d.id.toString(),
-        }))}
-        error={errors.day}
-      />
-
-      {/* Tipos de actividad */}
-      <FormSelect
-        label='Tipo de actividad'
-        value={form.activity_type}
-        onValueChange={(val) => onSelectChange('activity_type', val)}
-        options={activityTypes.map((at) => ({
-          label: at.name,
-          value: at.id.toString(),
-        }))}
-        error={errors.activity_type}
-      />
-
-      {/* Speakers */}
-      <FormSelect
-        label='Speaker'
-        value={form.speaker}
-        onValueChange={(val) => onSelectChange('speaker', val)}
-        options={speakers.map((s) => ({
-          label: s.name,
-          value: s.id.toString(),
-        }))}
-        error={errors.speaker}
-      />
-
-      {/* Fecha inicio + Duración */}
       <div className='grid grid-cols-2 gap-3'>
+        {/* Días */}
+        <FormSelect
+          label='Día'
+          value={form.day}
+          onValueChange={(val) => onSelectChange('day', val)}
+          options={days.map((d) => ({
+            label: d.title,
+            value: d.id.toString(),
+          }))}
+          error={errors.day}
+        />
+
+        {/* Speakers */}
+        <FormSelect
+          label='Speaker'
+          value={form.speaker}
+          onValueChange={(val) => onSelectChange('speaker', val)}
+          options={speakers.map((s) => ({
+            label: s.name,
+            value: s.id.toString(),
+          }))}
+          error={errors.speaker}
+        />
+      </div>
+
+      <div className='grid grid-cols-2 gap-3'>
+        {/* Tipos de actividad */}
+        <FormSelect
+          label='Tipo de actividad'
+          value={form.activity_type}
+          onValueChange={(val) => onSelectChange('activity_type', val)}
+          options={activityTypes.map((at) => ({
+            label: at.name,
+            value: at.id.toString(),
+          }))}
+          error={errors.activity_type}
+        />
+
         <FormInput
           id='start_date'
           label='Hora'
@@ -83,7 +84,10 @@ const ActivityFormFields = ({
           error={errors.start_date}
           type='time'
         />
+      </div>
 
+      {/* Fecha inicio + Duración */}
+      <div className='grid grid-cols-2 gap-3'>
         <FormInput
           id='duration'
           label='Duración'
@@ -92,17 +96,6 @@ const ActivityFormFields = ({
           error={errors.duration}
           type='number'
           min={1}
-        />
-      </div>
-
-      {/* Ubicación + Capacidad */}
-      <div className='grid grid-cols-2 gap-3'>
-        <FormInput
-          id='location'
-          label='location'
-          value={form.location}
-          onChange={onChange}
-          error={errors.location}
         />
 
         <FormInput
@@ -115,6 +108,15 @@ const ActivityFormFields = ({
           min={1}
         />
       </div>
+
+      {/* Ubicación + Capacidad */}
+      <FormInput
+        id='location'
+        label='location'
+        value={form.location}
+        onChange={onChange}
+        error={errors.location}
+      />
     </div>
   );
 };

@@ -16,15 +16,18 @@ type DayStore = {
   createDay: (payload: DayPayload) => Promise<void>;
   updateDay: (id: number, payload: Partial<DayPayload>) => Promise<void>;
   removeDay: (id: number) => Promise<void>;
+  invalidateDays: () => Promise<void>;
 };
 
-export const useDayStore = create<DayStore>((set) => ({
+export const useDayStore = create<DayStore>((set, get) => ({
   days: [],
   activities: [],
   loading: false,
   error: null,
 
   fetchDays: async () => {
+    const { days } = get();
+    if (days.length > 0) return;
     set({ loading: true, error: null });
     try {
       const days = await dayService.getAll();
@@ -52,6 +55,7 @@ export const useDayStore = create<DayStore>((set) => ({
     try {
       const newDay = await dayService.create(payload);
       set((state) => ({ days: [...state.days, newDay] }));
+      get().invalidateDays();
     } catch {
       throw new Error('Error al crear el día'); // 👈 propaga al componente
     }
@@ -63,6 +67,7 @@ export const useDayStore = create<DayStore>((set) => ({
       set((state) => ({
         days: state.days.map((d) => (d.id === id ? updated : d)),
       }));
+      get().invalidateDays();
     } catch {
       throw new Error('Error al actualizar el día'); // 👈
     }
@@ -74,8 +79,14 @@ export const useDayStore = create<DayStore>((set) => ({
       set((state) => ({
         days: state.days.filter((d) => d.id !== id),
       }));
+      get().invalidateDays();
     } catch {
       throw new Error('Error al eliminar el día'); // 👈
     }
   },
+
+  invalidateDays: async () => {
+    set({ days: [] });
+    await get().fetchDays();
+  }, // 👈
 }));
