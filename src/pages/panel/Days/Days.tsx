@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 
 type Row = Record<string, unknown>;
 
-const ActivityType = () => {
+const Days = () => {
   const { days, loading, error, fetchDays, removeDay, updateDay } =
     useDayStore();
   const [search, setSearch] = useState('');
@@ -197,4 +197,4 @@ const ActivityType = () => {
   );
 };
 
-export default ActivityType;
+export default Days;
