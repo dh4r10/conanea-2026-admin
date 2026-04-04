@@ -9,11 +9,11 @@ import SearchPanel from '../components/SearchPanel';
 import LoadingControl from '@/components/LoadingControl';
 
 import { useDayStore } from '@/store/useDayStore';
-import type { Day } from '@/types/day.types';
+import type { Days } from '@/types/days.types';
 import type { DaysForm, FormErrors } from './days.types';
 
-import DayActionButtons from './DaysActionButtons';
-import DayTableButtons from './DaysTableButtons';
+import DayActionButtons from './DayActionButtons';
+import DayTableButtons from './DayTableButtons';
 
 import ModalDelete from '../components/modals/ModalDelete';
 import ModalForm from '../components/modals/ModalForm';
@@ -27,7 +27,7 @@ import { toast } from 'sonner';
 
 type Row = Record<string, unknown>;
 
-const Days = () => {
+const Day = () => {
   const { days, loading, error, fetchDays, removeDay, updateDay } =
     useDayStore();
   const [search, setSearch] = useState('');
@@ -39,7 +39,7 @@ const Days = () => {
 
   // --- Modal Editar (el padre controla qué fila se edita) ---
   const [editOpen, setEditOpen] = useState(false);
-  const [rowToEdit, setRowToEdit] = useState<Day | null>(null);
+  const [rowToEdit, setRowToEdit] = useState<Days | null>(null);
   const [editForm, setEditForm] = useState<DaysForm>({
     title: '',
     date: '',
@@ -157,7 +157,7 @@ const Days = () => {
         <TablePanel columns={columns} data={filtered}>
           {(row) => (
             <DayTableButtons
-              row={row as Day}
+              row={row as Days}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
             />
@@ -197,4 +197,4 @@ const Days = () => {
   );
 };
 
-export default Days;
+export default Day;

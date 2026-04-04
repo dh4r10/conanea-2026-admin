@@ -9,7 +9,7 @@ import SearchPanel from '../components/SearchPanel';
 import LoadingControl from '@/components/LoadingControl';
 
 import { useSpeakerStore } from '@/store/useSpeakerStore';
-import type { Speaker } from '@/types/speaker.types';
+import type { Speakers } from '@/types/speakers.types';
 import { type SpeakerForm, type FormErrors, emptyForm } from './speaker.types';
 
 import SpeakerActionButtons from './SpeakerActionButtons';
@@ -55,7 +55,7 @@ const Speaker = () => {
 
   // --- Modal Editar (el padre controla qué fila se edita) ---
   const [editOpen, setEditOpen] = useState(false);
-  const [rowToEdit, setRowToEdit] = useState<Speaker | null>(null);
+  const [rowToEdit, setRowToEdit] = useState<Speakers | null>(null);
   const [editForm, setEditForm] = useState<SpeakerForm>(emptyForm);
   const [editErrors, setEditErrors] = useState<FormErrors>({});
   const [editLoading, setEditLoading] = useState(false);
@@ -180,7 +180,7 @@ const Speaker = () => {
         <TablePanel columns={columns} data={filtered}>
           {(row) => (
             <SpeakerTableButtons
-              row={row as Speaker}
+              row={row as Speakers}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
             />

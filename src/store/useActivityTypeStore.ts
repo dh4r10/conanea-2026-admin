@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { activityTypeService } from '@/services/activityTypeService';
-import type { ActivityType } from '@/types/activityType.types';
+import type { ActivityTypes } from '@/types/activityTypes.types';
 
-type ActivityTypePayload = Omit<ActivityType, 'id' | 'is_active'>;
+type ActivityTypePayload = Omit<ActivityTypes, 'id' | 'is_active'>;
 
 type ActivityTypeStore = {
-  activityTypes: ActivityType[];
+  activityTypes: ActivityTypes[];
   loading: boolean;
   error: string | null;
 

@@ -13,10 +13,7 @@ import { useActivityStore } from '@/store/useActivityStore';
 import { useDayStore } from '@/store/useDayStore';
 import { useActivityTypeStore } from '@/store/useActivityTypeStore';
 import { useSpeakerStore } from '@/store/useSpeakerStore';
-import type {
-  ActivityDetail,
-  Activity as ActivityType,
-} from '@/types/activity.types';
+import type { ActivityDetail, Activities } from '@/types/activities.types';
 import { toast } from 'sonner';
 import type { ActivityForm, FormErrors } from './activity.types';
 import ActivityFormFields from './ActivityFormFields';
@@ -103,7 +100,7 @@ const ActivityActionButtons = ({
     return Object.keys(errors).length === 0;
   };
 
-  type ActivityPayload = Omit<ActivityType, 'id' | 'is_active'>;
+  type ActivityPayload = Omit<Activities, 'id' | 'is_active'>;
 
   const formToPayload = (form: ActivityForm): ActivityPayload => ({
     name: form.name,

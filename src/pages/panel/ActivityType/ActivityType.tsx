@@ -9,7 +9,7 @@ import SearchPanel from '../components/SearchPanel';
 import LoadingControl from '@/components/LoadingControl';
 
 import { useActivityTypeStore } from '@/store/useActivityTypeStore';
-import type { ActivityType } from '@/types/activityType.types';
+import type { ActivityTypes } from '@/types/activityTypes.types';
 import type { ActivityTypeForm, FormErrors } from './activityType.types';
 
 import ActivityTypeActionButtons from './ActivityTypeActionButtons';
@@ -45,7 +45,7 @@ const ActivityType = () => {
 
   // --- Modal Editar (el padre controla qué fila se edita) ---
   const [editOpen, setEditOpen] = useState(false);
-  const [rowToEdit, setRowToEdit] = useState<ActivityType | null>(null);
+  const [rowToEdit, setRowToEdit] = useState<ActivityTypes | null>(null);
   const [editForm, setEditForm] = useState<ActivityTypeForm>({
     name: '',
     logo: '',
@@ -165,7 +165,7 @@ const ActivityType = () => {
         <TablePanel columns={columns} data={filtered}>
           {(row) => (
             <ActivityTypeTableButtons
-              row={row as ActivityType}
+              row={row as ActivityTypes}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
             />

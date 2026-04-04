@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import type { Speaker } from '@/types/speaker.types';
+import type { Speakers } from '@/types/speakers.types';
 
 interface SpeakerTableButtonsProps {
-  row: Speaker;
-  onEdit?: (row: Speaker) => void;
-  onDelete?: (row: Speaker) => void;
+  row: Speakers;
+  onEdit?: (row: Speakers) => void;
+  onDelete?: (row: Speakers) => void;
 }
 
 const SpeakerTableButtons = ({

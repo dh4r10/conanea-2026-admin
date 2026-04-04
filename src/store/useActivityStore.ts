@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { activityService } from '@/services/activityService';
-import type { Activity, ActivityDetail } from '@/types/activity.types';
+import type { Activities, ActivityDetail } from '@/types/activities.types';
 
-type ActivityPayload = Omit<Activity, 'id' | 'is_active'>;
+type ActivityPayload = Omit<Activities, 'id' | 'is_active'>;
 
 type ActivityStore = {
   activities: ActivityDetail[];

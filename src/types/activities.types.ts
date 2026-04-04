@@ -1,8 +1,8 @@
-import type { Speaker } from './speaker.types';
-import type { Day } from './day.types';
-import type { ActivityType } from './activityType.types';
+import type { Speakers } from './speakers.types';
+import type { Days } from './days.types';
+import type { ActivityTypes } from './activityTypes.types';
 
-export type Activity = {
+export type Activities = {
   id: number;
   activity_type: number;
   day: number;
@@ -18,9 +18,9 @@ export type Activity = {
 
 export type ActivityDetail = {
   id: number;
-  activity_type: ActivityType;
-  day: Day;
-  speaker: Speaker;
+  activity_type: ActivityTypes;
+  day: Days;
+  speaker: Speakers;
   name: string;
   order: number;
   start_date: string;

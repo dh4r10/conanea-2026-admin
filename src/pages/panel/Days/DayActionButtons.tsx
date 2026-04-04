@@ -13,7 +13,7 @@ import { validate } from '@/utils/validations';
 
 import { toast } from 'sonner'; // 👈 agregar
 
-const ActivityTypeActionButtons = () => {
+const DayActionButtons = () => {
   const { createDay } = useDayStore();
 
   // Modal Crear
@@ -91,4 +91,4 @@ const ActivityTypeActionButtons = () => {
   );
 };
 
-export default ActivityTypeActionButtons;
+export default DayActionButtons;

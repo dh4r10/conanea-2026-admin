@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { speakerService } from '@/services/speakerService';
-import type { Speaker } from '@/types/speaker.types';
+import type { Speakers } from '@/types/speakers.types';
 
 type SpeakerStore = {
-  speakers: Speaker[];
+  speakers: Speakers[];
   loading: boolean;
   error: string | null;
 

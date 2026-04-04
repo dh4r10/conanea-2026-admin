@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { dayService } from '@/services/dayService';
-import type { Day } from '@/types/day.types';
-import type { Activity } from '@/types/activity.types';
+import type { Days } from '@/types/days.types';
+import type { Activity } from '@/types/activities.types';
 
-type DayPayload = Omit<Day, 'id' | 'is_active'>;
+type DayPayload = Omit<Days, 'id' | 'is_active'>;
 
 type DayStore = {
-  days: Day[];
+  days: Days[];
   activities: Activity[];
   loading: boolean;
   error: string | null;

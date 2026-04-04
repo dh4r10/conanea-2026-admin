@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 import { useActivityStore } from '@/store/useActivityStore';
-import type {
-  ActivityDetail,
-  Activity as ActivityType,
-} from '@/types/activity.types';
+import type { ActivityDetail, Activities } from '@/types/activities.types';
 import HeaderPanel from '../components/HeaderPanel';
 import TablePanel from '../components/TablePanel';
 import FooterPanel from '../components/FooterPanel';
@@ -201,7 +198,7 @@ const Activity = () => {
         <TablePanel columns={columns} data={filtered}>
           {(row) => (
             <ActivityTableButtons
-              row={row as ActivityType}
+              row={row as Activities}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
             />

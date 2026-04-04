@@ -1,4 +1,4 @@
-export type ActivityType = {
+export type ActivityTypes = {
   id: number;
   name: string;
   logo: string;

@@ -1,7 +1,7 @@
 import { useActivityTypeStore } from '@/store/useActivityTypeStore';
 import { useDayStore } from '@/store/useDayStore';
 
-import type { Speaker } from '@/types/speaker.types';
+import type { Speakers } from '@/types/speakers.types';
 import type { ActivityForm, FormErrors } from './activity.types';
 import FormSelect from '../components/InputController/FormSelect';
 import FormInput from '../components/InputController/FormInput';
@@ -12,7 +12,7 @@ interface ActivityFormFieldsProps {
   errors: FormErrors;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectChange: (name: keyof ActivityForm, value: string) => void;
-  speakers: Speaker[]; //
+  speakers: Speakers[]; //
 }
 
 const ActivityFormFields = ({

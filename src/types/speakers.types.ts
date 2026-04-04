@@ -1,4 +1,4 @@
-export type Speaker = {
+export type Speakers = {
   id: number;
   name: string;
   title: string;

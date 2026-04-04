@@ -1,8 +1,8 @@
 import api from '@/lib/axios';
-import type { Activity, ActivityDetail } from '@/types/activity.types';
+import type { Activities, ActivityDetail } from '@/types/activities.types';
 
 // activityService.ts
-type ActivityPayload = Omit<Activity, 'id' | 'is_active'>;
+type ActivityPayload = Omit<Activities, 'id' | 'is_active'>;
 
 export const activityService = {
   getAll: (params?: {
@@ -21,17 +21,17 @@ export const activityService = {
 
   create: (payload: ActivityPayload) =>
     api
-      .post<Activity>('/activities/activity/', payload)
+      .post<Activities>('/activities/activity/', payload)
       .then((res) => res.data),
 
   update: (id: number, payload: Partial<ActivityPayload>) =>
     api
-      .patch<Activity>(`/activities/activity/${id}/`, payload)
+      .patch<Activities>(`/activities/activity/${id}/`, payload)
       .then((res) => res.data),
 
   remove: (id: number) =>
     api
-      .patch<Activity>(`/activities/activity/${id}/`, {
+      .patch<Activities>(`/activities/activity/${id}/`, {
         is_active: false,
       })
       .then((res) => res.data),

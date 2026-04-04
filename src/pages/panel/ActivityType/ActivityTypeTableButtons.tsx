@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import type { ActivityType } from '@/types/activityType.types';
+import type { ActivityTypes } from '@/types/activityTypes.types';
 
 interface ActivityTypeTableButtonsProps {
-  row: ActivityType;
-  onEdit?: (row: ActivityType) => void;
-  onDelete?: (row: ActivityType) => void;
+  row: ActivityTypes;
+  onEdit?: (row: ActivityTypes) => void;
+  onDelete?: (row: ActivityTypes) => void;
 }
 
 const ActivityTypeTableButtons = ({

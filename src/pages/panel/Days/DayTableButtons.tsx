@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import type { Day } from '@/types/day.types';
+import type { Days } from '@/types/days.types';
 
 interface DaysTableButtonsProps {
-  row: Day;
-  onEdit?: (row: Day) => void;
-  onDelete?: (row: Day) => void;
+  row: Days;
+  onEdit?: (row: Days) => void;
+  onDelete?: (row: Days) => void;
 }
 
-const DaysTableButtons = ({ row, onEdit, onDelete }: DaysTableButtonsProps) => {
+const DayTableButtons = ({ row, onEdit, onDelete }: DaysTableButtonsProps) => {
   return (
     <div className='flex items-center justify-end gap-1'>
       <Button
@@ -31,4 +31,4 @@ const DaysTableButtons = ({ row, onEdit, onDelete }: DaysTableButtonsProps) => {
   );
 };
 
-export default DaysTableButtons;
+export default DayTableButtons;
