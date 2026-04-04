@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Zap, Trash2 } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { useActivityStore } from '@/store/useActivityStore';
 import type {
   ActivityDetail,
@@ -12,17 +12,12 @@ import SearchPanel from '../components/SearchPanel';
 import ActivityActionButtons from './ActivityActionButtons';
 import ActivityFilters from './ActivityFilters';
 import ActivityTableButtons from './ActivityTableButtons';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+
+import LoadingControl from '@/components/LoadingControl';
+import ModalDelete from '../components/modals/ModalDelete';
+
 import { Toaster } from 'sonner';
 import { toast } from 'sonner';
-import LoadingControl from '@/components/LoadingControl';
 
 type Row = Record<string, unknown>;
 
@@ -217,46 +212,14 @@ const Activity = () => {
       </div>
 
       {/* Modal Eliminar */}
-      <Dialog open={confirmOpen} onOpenChange={handleDeleteCancel}>
-        <DialogContent className='bg-[#1a1a1a] border border-white/10 text-slate-200 sm:max-w-sm'>
-          <DialogHeader>
-            <div className='flex items-center gap-3 mb-1'>
-              <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20'>
-                <Trash2 className='h-4 w-4 text-red-400' />
-              </div>
-              <DialogTitle className='text-slate-100 text-lg font-semibold'>
-                Eliminar actividad
-              </DialogTitle>
-            </div>
-            <p className='text-sm text-slate-400 pl-12'>
-              ¿Estás seguro que deseas eliminar{' '}
-              <span className='text-slate-200 font-medium'>
-                {rowToDelete?.name as string}
-              </span>
-              ? Esta acción no se puede deshacer.
-            </p>
-          </DialogHeader>
-          <DialogFooter className='gap-2 pt-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='border-white/10 bg-transparent text-slate-400 hover:bg-white/5 hover:text-white transition'
-              onClick={handleDeleteCancel}
-              disabled={deleting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              size='sm'
-              className='bg-red-500 text-white font-semibold hover:bg-red-600 transition min-w-24'
-              onClick={handleDeleteConfirm}
-              disabled={deleting}
-            >
-              {deleting ? 'Eliminando...' : 'Sí, eliminar'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDelete
+        open={confirmOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        loading={deleting}
+        title='Eliminar actividad'
+        description={rowToDelete?.name as string}
+      />
 
       <Toaster position='bottom-right' richColors theme='dark' />
     </>

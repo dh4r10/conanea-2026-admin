@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { List } from 'lucide-react';
 
 interface Option {
   label: string;
@@ -32,7 +33,8 @@ const FormSelect = ({
   return (
     <div className='flex flex-col gap-2 cursor-pointer!'>
       {label && (
-        <Label className='text-xs font-semibold uppercase tracking-wider text-slate-400'>
+        <Label className='text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5'>
+          <List className='text-[#fbba0e] h-3 w-3 mb-px' />
           {label}
         </Label>
       )}

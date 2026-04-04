@@ -1,30 +1,35 @@
 import { useEffect, useState } from 'react';
-import { CalendarDays, Trash2 } from 'lucide-react';
-import { useDayStore } from '@/store/useDayStore';
-import type { Day } from '@/types/day.types';
+
+import { CalendarDays } from 'lucide-react';
+
 import HeaderPanel from '../components/HeaderPanel';
 import TablePanel from '../components/TablePanel';
 import FooterPanel from '../components/FooterPanel';
 import SearchPanel from '../components/SearchPanel';
-import DaysActionButtons from './DaysActionButtons';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import LoadingControl from '@/components/LoadingControl';
+
+import { useDayStore } from '@/store/useDayStore';
+import type { Day } from '@/types/day.types';
+import type { DaysForm, FormErrors } from './days.types';
+
+import DayActionButtons from './DaysActionButtons';
+import DayTableButtons from './DaysTableButtons';
+
+import ModalDelete from '../components/modals/ModalDelete';
+import ModalForm from '../components/modals/ModalForm';
+
+import { columns } from './columns';
+import { fields } from './fields';
+import { validate } from '@/utils/validations';
 
 import { Toaster } from 'sonner'; // 👈 agregar
 import { toast } from 'sonner';
-import LoadingControl from '@/components/LoadingControl';
-import DaysTableButtons from './DaysTableButtons';
 
 type Row = Record<string, unknown>;
 
-const Days = () => {
-  const { days, loading, error, fetchDays, removeDay } = useDayStore();
+const ActivityType = () => {
+  const { days, loading, error, fetchDays, removeDay, updateDay } =
+    useDayStore();
   const [search, setSearch] = useState('');
 
   // --- Modal Eliminar ---
@@ -35,37 +40,30 @@ const Days = () => {
   // --- Modal Editar (el padre controla qué fila se edita) ---
   const [editOpen, setEditOpen] = useState(false);
   const [rowToEdit, setRowToEdit] = useState<Day | null>(null);
-
-  const columns = [
-    { id: 1, label: 'Título', key: 'title' },
-    { id: 2, label: 'Fecha', key: 'date' },
-  ];
+  const [editForm, setEditForm] = useState<DaysForm>({
+    title: '',
+    date: '',
+  });
+  const [editErrors, setEditErrors] = useState<FormErrors>({});
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     fetchDays();
   }, []);
 
-  const filtered = days.filter(
-    (d) =>
-      d.title.toLowerCase().includes(search.toLowerCase()) ||
-      d.date.includes(search),
+  useEffect(() => {
+    if (editOpen && rowToEdit) {
+      setEditForm({
+        title: rowToEdit.title,
+        date: rowToEdit.date,
+      });
+      setEditErrors({});
+    }
+  }, [editOpen, rowToEdit]);
+
+  const filtered = days.filter((d) =>
+    d.title.toLowerCase().includes(search.toLowerCase()),
   );
-
-  const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('T')[0].split('-').map(Number);
-    const date = new Date(year, month - 1, day); // 👈 constructor local, sin UTC
-
-    return new Intl.DateTimeFormat('es-PE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date);
-  };
-
-  const formattedData = filtered.map((d) => ({
-    ...d,
-    date: formatDate(d.date),
-  }));
 
   // Abre el modal de editar con la fila seleccionada
   const handleEditRequest = (row: Row) => {
@@ -91,9 +89,42 @@ const Days = () => {
       setConfirmOpen(false);
       setRowToDelete(null);
     } catch {
-      toast.error('Error al eliminar el día. Intenta nuevamente.');
+      toast.error(
+        'Error al eliminar el tipo de actividad. Intenta nuevamente.',
+      );
     } finally {
       setDeleting(false); // 👈 siempre se ejecuta, salga bien o mal
+    }
+  };
+
+  const handleEditOpen = (val: boolean) => {
+    setEditOpen(val);
+    if (!val) {
+      setEditForm({ title: '', date: '' });
+      setEditErrors({});
+    }
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setEditErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+  };
+
+  const handleEditSubmit = async () => {
+    if (!rowToEdit) return;
+    if (!validate(editForm, fields, setEditErrors)) return;
+    setEditLoading(true);
+    try {
+      await updateDay(rowToEdit.id, {
+        title: editForm.title,
+        date: editForm.date,
+      });
+      toast.success('Día actualizado correctamente.'); // 👈
+      handleEditOpen(false);
+    } catch {
+      toast.error('Error al actualizar el día. Intenta nuevamente.'); // 👈
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -115,11 +146,7 @@ const Days = () => {
 
       <div className='rounded-2xl border border-white/10 bg-[#1a1a1a] shadow-xl'>
         <div className='flex flex-col gap-3 border-b border-white/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between'>
-          <DaysActionButtons
-            rowToEdit={rowToEdit}
-            editOpen={editOpen}
-            onEditOpenChange={setEditOpen}
-          />
+          <DayActionButtons />
           <SearchPanel
             search={search}
             setSearch={setSearch}
@@ -127,9 +154,9 @@ const Days = () => {
           />
         </div>
 
-        <TablePanel columns={columns} data={formattedData}>
+        <TablePanel columns={columns} data={filtered}>
           {(row) => (
-            <DaysTableButtons
+            <DayTableButtons
               row={row as Day}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
@@ -141,50 +168,33 @@ const Days = () => {
       </div>
 
       {/* Modal Eliminar */}
-      <Dialog open={confirmOpen} onOpenChange={handleDeleteCancel}>
-        <DialogContent className='bg-[#1a1a1a] border border-white/10 text-slate-200 sm:max-w-sm'>
-          <DialogHeader>
-            <div className='flex items-center gap-3 mb-1'>
-              <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20'>
-                <Trash2 className='h-4 w-4 text-red-400' />
-              </div>
-              <DialogTitle className='text-slate-100 text-lg font-semibold'>
-                Eliminar día
-              </DialogTitle>
-            </div>
-            <p className='text-sm text-slate-400 pl-12'>
-              ¿Estás seguro que deseas eliminar{' '}
-              <span className='text-slate-200 font-medium'>
-                {rowToDelete?.title as string}
-              </span>
-              ? Esta acción no se puede deshacer.
-            </p>
-          </DialogHeader>
-          <DialogFooter className='gap-2 pt-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='border-white/10 bg-transparent text-slate-400 hover:bg-white/5 hover:text-white transition'
-              onClick={handleDeleteCancel}
-              disabled={deleting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              size='sm'
-              className='bg-red-500 text-white font-semibold hover:bg-red-600 transition min-w-24'
-              onClick={handleDeleteConfirm}
-              disabled={deleting}
-            >
-              {deleting ? 'Eliminando...' : 'Sí, eliminar'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ModalDelete
+        open={confirmOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        loading={deleting}
+        title='Eliminar día'
+        description={rowToDelete?.title as string}
+      />
+
+      <ModalForm
+        mode='edit'
+        open={editOpen}
+        onOpenChange={handleEditOpen}
+        fields={fields}
+        form={editForm}
+        errors={editErrors}
+        onChange={handleEditChange}
+        onSubmit={handleEditSubmit}
+        loading={editLoading}
+        title='Nuevo Día'
+        description='Completa los campos.'
+        icon={<CalendarDays className='h-4 w-4 text-black' />}
+      />
 
       <Toaster position='bottom-right' richColors theme='dark' />
     </>
   );
 };
 
-export default Days;
+export default ActivityType;

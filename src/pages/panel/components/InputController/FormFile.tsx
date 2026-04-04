@@ -16,10 +16,8 @@ const FormFile = ({
   label = 'Foto',
 }: FormFileProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  //   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  // Generar preview cuando cambia el value
   const preview = useMemo(() => {
     if (!value) return null;
     return URL.createObjectURL(value);
