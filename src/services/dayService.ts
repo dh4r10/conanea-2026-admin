@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import type { Days } from '@/types/days.types';
-import type { Activity } from '@/types/activities.types';
+import type { Activities } from '@/types/activities.types';
 
 type DayPayload = Omit<Days, 'id' | 'is_active'>;
 
@@ -23,6 +23,6 @@ export const dayService = {
 
   getActivities: (id: number) =>
     api
-      .get<Activity[]>(`/activities/day/${id}/activities/`)
+      .get<Activities[]>(`/activities/day/${id}/activities/`)
       .then((res) => res.data),
 };

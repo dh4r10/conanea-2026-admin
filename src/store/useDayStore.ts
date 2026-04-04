@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { dayService } from '@/services/dayService';
 import type { Days } from '@/types/days.types';
-import type { Activity } from '@/types/activities.types';
+import type { Activities } from '@/types/activities.types';
 
 type DayPayload = Omit<Days, 'id' | 'is_active'>;
 
 type DayStore = {
   days: Days[];
-  activities: Activity[];
+  activities: Activities[];
   loading: boolean;
   error: string | null;
 
