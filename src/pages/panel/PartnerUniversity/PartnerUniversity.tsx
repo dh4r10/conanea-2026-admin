@@ -91,10 +91,17 @@ const PartnerUniversity = () => {
   >(undefined);
 
   useEffect(() => {
-    fetchUniversities(1, {
-      search: search || undefined,
-      quota_type_id: selectedQuotaTypeId,
-    });
+    const timeout = setTimeout(
+      () => {
+        fetchUniversities(1, {
+          search: search || undefined,
+          quota_type_id: selectedQuotaTypeId,
+        });
+      },
+      search ? 400 : 0,
+    ); // 👈 debounce solo si hay texto, inmediato si es filtro
+
+    return () => clearTimeout(timeout);
   }, [search, selectedQuotaTypeId]);
 
   useEffect(() => {

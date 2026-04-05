@@ -1,3 +1,4 @@
+// SearchPanel.tsx — sin cambios, igual que antes
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
