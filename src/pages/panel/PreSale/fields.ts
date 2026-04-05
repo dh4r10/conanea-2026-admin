@@ -16,7 +16,6 @@ export const fields: Field[] = [
     label: 'Fecha Inicio',
     type: 'datetime-local',
     placeholder: 'Fecha Inicio',
-    fullWidth: true,
     required: true,
   },
   {
@@ -25,7 +24,6 @@ export const fields: Field[] = [
     label: 'Fecha Fin',
     type: 'datetime-local',
     placeholder: 'Fecha Fin',
-    fullWidth: true,
     required: true,
   },
 ];

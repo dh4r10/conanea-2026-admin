@@ -179,7 +179,7 @@ const PreSale = () => {
         onConfirm={handleDeleteConfirm}
         loading={deleting}
         title='Eliminar día'
-        description={rowToDelete?.title as string}
+        description={rowToDelete?.name as string}
       />
 
       <ModalForm
@@ -193,7 +193,7 @@ const PreSale = () => {
         onSubmit={handleEditSubmit}
         loading={editLoading}
         title='Editar Preventa'
-        description='Completa los campos.'
+        description='Edita los campos de la preventa.'
         icon={<ChartSpline className='h-4 w-4 text-black' />}
       />
 

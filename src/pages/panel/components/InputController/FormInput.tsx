@@ -1,4 +1,4 @@
-// import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Type, Mail, Lock, Hash, Calendar } from 'lucide-react';
 
@@ -68,7 +68,7 @@ const FormInput = ({
         {label}
       </Label>
 
-      <input
+      <Input
         key={
           type === 'date' || type === 'datetime-local'
             ? displayValue

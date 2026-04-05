@@ -22,6 +22,8 @@ import {
   ActivityIcon,
   DollarSign,
   ChartSpline,
+  Ticket,
+  University,
 } from 'lucide-react';
 
 import {
@@ -143,6 +145,14 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
+              <Link to='/available-slot'>
+                <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
+                  <Ticket className='w-4 h-4' />
+                  <span>Cupos</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
               <Link to='/pre-sale'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <ChartSpline className='w-4 h-4' />
@@ -150,11 +160,28 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
+
             <SidebarMenuItem>
               <Link to='/quota-type'>
                 <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
                   <DollarSign className='w-4 h-4' />
                   <span>Tipos de Cuota</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className=' text-[#fbba0e]'>
+            Académico
+          </SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Link to='/partner-university'>
+                <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
+                  <University className='w-4 h-4' />
+                  <span>Universidades</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

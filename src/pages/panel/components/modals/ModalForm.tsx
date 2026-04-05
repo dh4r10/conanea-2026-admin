@@ -24,6 +24,7 @@ interface ModalFormProps<T extends Record<string, unknown>> {
   mode?: 'create' | 'edit';
   onFile?: (id: string, file: File | null) => void;
   currentPhoto?: string;
+  onValueChange?: (id: string, value: string) => void;
 }
 
 const ModalForm = <T extends Record<string, unknown>>({
@@ -41,6 +42,7 @@ const ModalForm = <T extends Record<string, unknown>>({
   mode = 'create',
   onFile,
   currentPhoto,
+  onValueChange,
 }: ModalFormProps<T>) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,6 +56,7 @@ const ModalForm = <T extends Record<string, unknown>>({
           onChange={onChange}
           onFile={onFile}
           currentPhoto={currentPhoto}
+          onValueChange={onValueChange}
         />
 
         <DialogFooter className='gap-2 pt-2'>

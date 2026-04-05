@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Brackets } from 'lucide-react';
+import { University } from 'lucide-react';
 
 import HeaderPanel from '../components/HeaderPanel';
 import TablePanel from '../components/TablePanel';
@@ -8,18 +8,30 @@ import FooterPanel from '../components/FooterPanel';
 import SearchPanel from '../components/SearchPanel';
 import LoadingControl from '@/components/LoadingControl';
 
-import { useActivityTypeStore } from '@/store/useActivityTypeStore';
-import type { ActivityTypes } from '@/types/activityTypes.types';
-import type { ActivityTypeForm, FormErrors } from './activityType.types';
+import { useAvailableSlotStore } from '@/store/useAvailableSlotStore';
+import { usePreSaleStore } from '@/store/usePreSaleStore';
+import { useQuotaTypeStore } from '@/store/useQuotaTypeStore';
 
-import ActivityTypeActionButtons from './ActivityTypeActionButtons';
-import ActivityTypeTableButtons from './ActivityTypeTableButtons';
+import type {
+  AvailableSlots,
+  AvailableSlotDetail,
+} from '@/types/availableSlots.types';
+import {
+  type AvailableSlotForm,
+  type FormErrors,
+  type AvailableSlotPayload,
+  emptyForm,
+} from './availableSlot.types';
+
+import AvailableSlotActionButtons from './AvailableActionButtons';
+import AvailableSlotTableButtons from './AvailableSlotTableButtons';
 
 import ModalDelete from '../components/modals/ModalDelete';
 import ModalForm from '../components/modals/ModalForm';
+import AvailableSlotFilters from './AvailableSlotFilters';
 
 import { columns } from './columns';
-import { fields } from './fields';
+import { getAvailableSlotFields } from './fields';
 import { validate } from '@/utils/validations';
 
 import { Toaster } from 'sonner'; // 👈 agregar
@@ -27,53 +39,82 @@ import { toast } from 'sonner';
 
 type Row = Record<string, unknown>;
 
-const ActivityType = () => {
+const formToPayload = (form: AvailableSlotForm): AvailableSlotPayload => ({
+  pre_sale: Number(form.pre_sale),
+  quota_type: Number(form.quota_type),
+  mount: Number(form.mount),
+  amount: Number(form.amount),
+});
+
+const AvailableSlot = () => {
   const {
-    activityTypes,
+    availableSlots,
     loading,
     error,
-    fetchActivityTypes,
-    removeActivityType,
-    updateActivityType,
-  } = useActivityTypeStore();
+    fetchAvailableSlots,
+    removeAvailableSlot,
+    updateAvailableSlot,
+  } = useAvailableSlotStore();
+
+  const { preSales } = usePreSaleStore();
+
+  const { quotaTypes } = useQuotaTypeStore();
+
   const [search, setSearch] = useState('');
 
   // --- Modal Eliminar ---
   const [confirmOpen, setConfirmOpen] = useState(false);
+
   const [rowToDelete, setRowToDelete] = useState<Row | null>(null);
+
   const [deleting, setDeleting] = useState(false);
 
   // --- Modal Editar (el padre controla qué fila se edita) ---
   const [editOpen, setEditOpen] = useState(false);
-  const [rowToEdit, setRowToEdit] = useState<ActivityTypes | null>(null);
-  const [editForm, setEditForm] = useState<ActivityTypeForm>({
-    name: '',
-    logo: '',
-  });
+
+  const [rowToEdit, setRowToEdit] = useState<AvailableSlotDetail | null>(null);
+
+  const [editForm, setEditForm] = useState<AvailableSlotForm>(emptyForm);
+
   const [editErrors, setEditErrors] = useState<FormErrors>({});
+
   const [editLoading, setEditLoading] = useState(false);
 
+  // --- Filtros ---
+  const [selectedPreSaleId, setSelectedPreSaleId] = useState<
+    number | undefined
+  >(undefined);
+
+  const [selectedQuotaTypeId, setSelectedQuotaTypeId] = useState<
+    number | undefined
+  >(undefined);
+
   useEffect(() => {
-    fetchActivityTypes();
+    fetchAvailableSlots();
   }, []);
 
   useEffect(() => {
     if (editOpen && rowToEdit) {
       setEditForm({
-        name: rowToEdit.name,
-        logo: rowToEdit.logo,
+        pre_sale: rowToEdit.pre_sale.id.toString(),
+        quota_type: rowToEdit.quota_type.id.toString(),
+        mount: rowToEdit.mount.toString(),
+        amount: rowToEdit.amount.toString(),
       });
       setEditErrors({});
     }
   }, [editOpen, rowToEdit]);
 
-  const filtered = activityTypes.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const fields = getAvailableSlotFields(preSales, quotaTypes);
+
+  const handleEditSelectChange = (id: string, value: string) => {
+    setEditForm((prev) => ({ ...prev, [id]: value }));
+    setEditErrors((prev) => ({ ...prev, [id]: undefined }));
+  };
 
   // Abre el modal de editar con la fila seleccionada
   const handleEditRequest = (row: Row) => {
-    const original = activityTypes.find((d) => d.id === (row.id as number));
+    const original = availableSlots.find((d) => d.id === (row.id as number));
     if (original) {
       setRowToEdit(original); // usa los datos originales (no formateados)
       setEditOpen(true);
@@ -90,23 +131,21 @@ const ActivityType = () => {
     if (!rowToDelete) return;
     setDeleting(true);
     try {
-      await removeActivityType(rowToDelete.id as number);
-      toast.success('Tipo de actividad eliminada correctamente.');
+      await removeAvailableSlot(rowToDelete.id as number);
+      toast.success('Cupo eliminado correctamente.');
       setConfirmOpen(false);
       setRowToDelete(null);
     } catch {
-      toast.error(
-        'Error al eliminar el tipo de actividad. Intenta nuevamente.',
-      );
+      toast.error('Error al eliminar el cupo. Intenta nuevamente.');
     } finally {
-      setDeleting(false); // 👈 siempre se ejecuta, salga bien o mal
+      setDeleting(false);
     }
   };
 
   const handleEditOpen = (val: boolean) => {
     setEditOpen(val);
     if (!val) {
-      setEditForm({ name: '', logo: '' });
+      setEditForm(emptyForm);
       setEditErrors({});
     }
   };
@@ -121,16 +160,11 @@ const ActivityType = () => {
     if (!validate(editForm, fields, setEditErrors)) return;
     setEditLoading(true);
     try {
-      await updateActivityType(rowToEdit.id, {
-        name: editForm.name,
-        logo: editForm.logo,
-      });
-      toast.success('Tipo de actividad actualizada correctamente.'); // 👈
+      await updateAvailableSlot(rowToEdit.id, formToPayload(editForm));
+      toast.success('Cupo actualizado correctamente.');
       handleEditOpen(false);
     } catch {
-      toast.error(
-        'Error al actualizar el tipo de actividad. Intenta nuevamente.',
-      ); // 👈
+      toast.error('Error al actualizar el cupo. Intenta nuevamente.');
     } finally {
       setEditLoading(false);
     }
@@ -141,6 +175,19 @@ const ActivityType = () => {
     setRowToDelete(null);
   };
 
+  const filtered = availableSlots.filter((d) => {
+    const matchSearch = d.pre_sale.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchDay = selectedPreSaleId
+      ? d.pre_sale.id === selectedPreSaleId
+      : true;
+    const matchType = selectedQuotaTypeId
+      ? d.quota_type.id === selectedQuotaTypeId
+      : true;
+    return matchSearch && matchDay && matchType;
+  });
+
   if (loading) return <LoadingControl />;
   if (error) return <p className='text-red-400 p-8'>{error}</p>;
 
@@ -148,24 +195,32 @@ const ActivityType = () => {
     <>
       <HeaderPanel
         title='Panel de Control'
-        description='Gestión de Tipos de Actividades'
-        icon={<Brackets className='h-5 w-5 text-black' />}
+        description='Gestión de Cupos'
+        icon={<University className='h-5 w-5 text-black' />}
       />
 
       <div className='rounded-2xl border border-white/10 bg-[#1a1a1a] shadow-xl'>
         <div className='flex flex-col gap-3 border-b border-white/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between'>
-          <ActivityTypeActionButtons />
+          <div className='flex flex-wrap items-center gap-2'>
+            <AvailableSlotActionButtons />
+            <AvailableSlotFilters
+              selectedPreSaleId={selectedPreSaleId}
+              selectedQuotaTypeId={selectedQuotaTypeId}
+              onPreSaleChange={setSelectedPreSaleId}
+              onQuotaTypeChange={setSelectedQuotaTypeId}
+            />
+          </div>
           <SearchPanel
             search={search}
             setSearch={setSearch}
-            placeholder='Buscar tipos de actividades...'
+            placeholder='Buscar cupos...'
           />
         </div>
 
         <TablePanel columns={columns} data={filtered}>
           {(row) => (
-            <ActivityTypeTableButtons
-              row={row as ActivityTypes}
+            <AvailableSlotTableButtons
+              row={row as AvailableSlots}
               onEdit={handleEditRequest}
               onDelete={handleDeleteRequest}
             />
@@ -174,7 +229,7 @@ const ActivityType = () => {
 
         <FooterPanel
           filtered={filtered.length}
-          elements={activityTypes.length}
+          elements={availableSlots.length}
         />
       </div>
 
@@ -184,8 +239,8 @@ const ActivityType = () => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         loading={deleting}
-        title='Eliminar tipo de actividad'
-        description={rowToDelete?.name as string}
+        title='Eliminar cupo'
+        description={rowToDelete?.title as string}
       />
 
       <ModalForm
@@ -198,9 +253,10 @@ const ActivityType = () => {
         onChange={handleEditChange}
         onSubmit={handleEditSubmit}
         loading={editLoading}
-        title='Editar Tipo de Actividad'
-        description='Edita los campos del tipo de actividad.'
-        icon={<Brackets className='h-4 w-4 text-black' />}
+        title='Editar Cupo'
+        description='Edita los campos del cupo.'
+        icon={<University className='h-4 w-4 text-black' />}
+        onValueChange={handleEditSelectChange}
       />
 
       <Toaster position='bottom-right' richColors theme='dark' />
@@ -208,4 +264,4 @@ const ActivityType = () => {
   );
 };
 
-export default ActivityType;
+export default AvailableSlot;

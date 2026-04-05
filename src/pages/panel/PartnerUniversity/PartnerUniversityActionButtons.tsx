@@ -1,58 +1,60 @@
 import { useState } from 'react';
 
-import { Plus, Zap } from 'lucide-react';
+import { Plus, University } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import ModalForm from '../components/modals/ModalForm';
 
-import { useActivityStore } from '@/store/useActivityStore';
-import { useDayStore } from '@/store/useDayStore';
-import { useActivityTypeStore } from '@/store/useActivityTypeStore';
-import { useSpeakerStore } from '@/store/useSpeakerStore';
+import { usePartnerUniversityStore } from '@/store/usePartnerUniversityStore';
+import { useQuotaTypeStore } from '@/store/useQuotaTypeStore';
 
 import {
-  type ActivityForm,
+  type PartnerUniversityForm,
   type FormErrors,
-  type ActivityPayload,
+  type PartnerUniversityPayload,
   emptyForm,
-} from './activity.types';
+} from './partnerUniversity.types';
 
-import { getActivityFields } from './fields';
+import { getAvailableSlotFields } from './fields';
 import { validate } from '@/utils/validations';
 
 import { toast } from 'sonner'; // 👈 agregar
 
-const formToPayload = (form: ActivityForm): ActivityPayload => ({
+const formToPayload = (
+  form: PartnerUniversityForm,
+): PartnerUniversityPayload => ({
+  quota_type: Number(form.quota_type),
   name: form.name,
-  order: Number(form.order),
-  start_date: form.start_date,
-  duration: Number(form.duration),
-  location: form.location,
-  capacity: Number(form.capacity),
-  day: Number(form.day),
-  activity_type: Number(form.activity_type),
-  speaker: Number(form.speaker),
+  abbreviation: form.abbreviation,
+  country: form.country,
+  region: form.region,
+  place: form.place,
 });
 
-const ActivityTypeActionButtons = () => {
-  const { createActivity } = useActivityStore();
+interface PartnerUniversityActionButtonsProps {
+  onCreated: () => void;
+  onFilterChange: () => void;
+}
 
-  const { days } = useDayStore();
+const PartnerUniversityActionButtons = ({
+  onCreated,
+  onFilterChange,
+}: PartnerUniversityActionButtonsProps) => {
+  const { createUniversity } = usePartnerUniversityStore();
 
-  const { activityTypes } = useActivityTypeStore();
-
-  const { speakers } = useSpeakerStore();
+  const { quotaTypes } = useQuotaTypeStore();
 
   // Modal Crear
   const [createOpen, setCreateOpen] = useState(false);
 
-  const [createForm, setCreateForm] = useState<ActivityForm>(emptyForm);
+  const [createForm, setCreateForm] =
+    useState<PartnerUniversityForm>(emptyForm);
 
   const [createErrors, setCreateErrors] = useState<FormErrors>({});
 
   const [createLoading, setCreateLoading] = useState(false);
 
-  const fields = getActivityFields(days, speakers, activityTypes);
+  const fields = getAvailableSlotFields(quotaTypes);
 
   // Handlers Crear
   const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +66,16 @@ const ActivityTypeActionButtons = () => {
     if (!validate(createForm, fields, setCreateErrors)) return;
     setCreateLoading(true);
     try {
-      await createActivity(formToPayload(createForm));
-      toast.success('Actividad creada correctamente.'); // 👈
+      await createUniversity(formToPayload(createForm));
+      toast.success('Universidad asociada creada correctamente.'); // 👈
       setCreateForm(emptyForm);
       setCreateOpen(false);
+      onCreated?.();
+      onFilterChange?.();
     } catch {
-      toast.error('Error al crear la actividad. Intenta nuevamente.'); // 👈
+      toast.error(
+        'Error al crear la universidad asociada. Intenta nuevamente.',
+      ); // 👈
     } finally {
       setCreateLoading(false);
     }
@@ -111,13 +117,13 @@ const ActivityTypeActionButtons = () => {
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
         loading={createLoading}
-        title='Nueva Actividad'
+        title='Nueva Universidad Asociada'
         description='Completa los campos.'
-        icon={<Zap className='h-4 w-4 text-black' />}
+        icon={<University className='h-4 w-4 text-black' />}
         onValueChange={handleCreateSelectChange}
       />
     </div>
   );
 };
 
-export default ActivityTypeActionButtons;
+export default PartnerUniversityActionButtons;

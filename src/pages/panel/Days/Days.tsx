@@ -189,8 +189,8 @@ const Day = () => {
         onChange={handleEditChange}
         onSubmit={handleEditSubmit}
         loading={editLoading}
-        title='Nuevo Día'
-        description='Completa los campos.'
+        title='Editar Día'
+        description='Edita los campos del día.'
         icon={<CalendarDays className='h-4 w-4 text-black' />}
       />
 

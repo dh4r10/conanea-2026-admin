@@ -4,3 +4,8 @@ export type ActivityTypeForm = {
 };
 
 export type FormErrors = Partial<Record<keyof ActivityTypeForm, string>>;
+
+export const emptyForm: ActivityTypeForm = {
+  name: '',
+  logo: '',
+};

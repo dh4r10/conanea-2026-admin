@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import type { Activities } from '@/types/activities.types';
+import type { PartnerUniversities } from '@/types/partnerUniversties.types';
 
-interface ActivityTableButtonsProps {
-  row: Activities;
-  onEdit?: (row: Activities) => void;
-  onDelete?: (row: Activities) => void;
+interface PartnerUniversityTableButtonsProps {
+  row: PartnerUniversities;
+  onEdit?: (row: PartnerUniversities) => void;
+  onDelete?: (row: PartnerUniversities) => void;
 }
 
-const ActivityTableButtons = ({
+const PartnerUniversityTableButtons = ({
   row,
   onEdit,
   onDelete,
-}: ActivityTableButtonsProps) => {
+}: PartnerUniversityTableButtonsProps) => {
   return (
     <div className='flex items-center justify-end gap-1'>
       <Button
@@ -35,4 +35,4 @@ const ActivityTableButtons = ({
   );
 };
 
-export default ActivityTableButtons;
+export default PartnerUniversityTableButtons;

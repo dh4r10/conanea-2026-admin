@@ -1,32 +1,95 @@
 import { useEffect, useState } from 'react';
+
 import { Zap } from 'lucide-react';
-import { useActivityStore } from '@/store/useActivityStore';
-import type { ActivityDetail, Activities } from '@/types/activities.types';
+
 import HeaderPanel from '../components/HeaderPanel';
 import TablePanel from '../components/TablePanel';
 import FooterPanel from '../components/FooterPanel';
 import SearchPanel from '../components/SearchPanel';
+import LoadingControl from '@/components/LoadingControl';
+
+import { useActivityStore } from '@/store/useActivityStore';
+import { useDayStore } from '@/store/useDayStore';
+import { useActivityTypeStore } from '@/store/useActivityTypeStore';
+import { useSpeakerStore } from '@/store/useSpeakerStore';
+
+import type { Activities, ActivityDetail } from '@/types/activities.types';
+import {
+  type ActivityForm,
+  type FormErrors,
+  type ActivityPayload,
+  emptyForm,
+} from './activity.types';
+
 import ActivityActionButtons from './ActivityActionButtons';
-import ActivityFilters from './ActivityFilters';
 import ActivityTableButtons from './ActivityTableButtons';
 
-import LoadingControl from '@/components/LoadingControl';
 import ModalDelete from '../components/modals/ModalDelete';
+import ModalForm from '../components/modals/ModalForm';
+import ActivityFilters from './ActivityFilters';
 
-import { Toaster } from 'sonner';
+import { getActivityColumns } from './columns';
+import { getActivityFields } from './fields';
+import { validate } from '@/utils/validations';
+
+import { Toaster } from 'sonner'; // 👈 agregar
 import { toast } from 'sonner';
 
 type Row = Record<string, unknown>;
 
+const formToPayload = (form: ActivityForm): ActivityPayload => ({
+  name: form.name,
+  order: Number(form.order),
+  start_date: form.start_date,
+  duration: Number(form.duration),
+  location: form.location,
+  capacity: Number(form.capacity),
+  day: Number(form.day),
+  activity_type: Number(form.activity_type),
+  speaker: Number(form.speaker),
+});
+
 const Activity = () => {
-  const { activities, loading, error, fetchActivities, removeActivity } =
-    useActivityStore();
+  const {
+    activities,
+    loading,
+    error,
+    fetchActivities,
+    removeActivity,
+    updateActivity,
+  } = useActivityStore();
+
+  const { days } = useDayStore();
+
+  const { activityTypes } = useActivityTypeStore();
+
+  const { speakers } = useSpeakerStore();
+
   const [search, setSearch] = useState('');
+
+  // --- Modal Eliminar ---
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [rowToDelete, setRowToDelete] = useState<Row | null>(null);
+
+  const [deleting, setDeleting] = useState(false);
+
+  // --- Modal Editar (el padre controla qué fila se edita) ---
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [rowToEdit, setRowToEdit] = useState<ActivityDetail | null>(null);
+
+  const [editForm, setEditForm] = useState<ActivityForm>(emptyForm);
+
+  const [editErrors, setEditErrors] = useState<FormErrors>({});
+
+  const [editLoading, setEditLoading] = useState(false);
 
   // --- Filtros ---
   const [selectedDayId, setSelectedDayId] = useState<number | undefined>(
     undefined,
   );
+
   const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<
     number | undefined
   >(undefined);
@@ -35,101 +98,41 @@ const Activity = () => {
     number | undefined
   >(undefined);
 
-  // --- Modal Eliminar ---
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState<Row | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  // --- Modal Editar ---
-  const [editOpen, setEditOpen] = useState(false);
-  const [rowToEdit, setRowToEdit] = useState<ActivityDetail | null>(null);
-
-  const columns = [
-    { id: 1, label: 'Nombre', key: 'name' },
-    {
-      id: 2,
-      label: 'Día',
-      key: 'day',
-      render: (value: unknown) => {
-        const day = value as { title: string };
-        return (
-          <span className='text-slate-200 text-sm'>{day?.title ?? '—'}</span>
-        );
-      },
-    },
-    {
-      id: 3,
-      label: 'Inicio',
-      key: 'start_date',
-      render: (value: unknown) => {
-        if (!value) return <span className='text-slate-500 text-xs'>—</span>;
-        const time = (value as string).slice(0, 5);
-        return <span className='text-slate-200 text-sm'>{time}</span>;
-      },
-    },
-    {
-      id: 4,
-      label: 'Tipo',
-      key: 'activity_type',
-      render: (value: unknown) => {
-        const type = value as { name: string };
-        return (
-          <span className='text-slate-200 text-sm'>{type?.name ?? '—'}</span>
-        );
-      },
-    },
-    {
-      id: 5,
-      label: 'Speaker',
-      key: 'speaker',
-      render: (value: unknown) => {
-        const speaker = value as { name: string };
-        return speaker ? (
-          <div className='flex items-center gap-2'>
-            <span className='text-slate-200 text-sm'>{speaker.name}</span>
-          </div>
-        ) : (
-          <span className='text-slate-500 text-xs'>Sin speaker</span>
-        );
-      },
-    },
-    {
-      id: 6,
-      label: 'Duración',
-      key: 'duration',
-      render: (value: unknown) => {
-        const minutes = value as number;
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        const formatted =
-          h > 0 ? `${h}h ${m > 0 ? `${m}min` : ''}`.trim() : `${m}min`;
-        return <span className='text-slate-200 text-sm'>{formatted}</span>;
-      },
-    },
-    { id: 7, label: 'Ubicación', key: 'location' },
-    { id: 8, label: 'Capacidad', key: 'capacity' },
-  ];
-
-  // Re-fetch cuando cambian los filtros
   useEffect(() => {
-    if (selectedDayId !== undefined) {
-      fetchActivities({
-        day_id: selectedDayId,
-        activity_type_id: selectedActivityTypeId,
-        speaker_id: selectedSpeakerId,
+    fetchActivities();
+  }, []);
+
+  useEffect(() => {
+    if (editOpen && rowToEdit) {
+      setEditForm({
+        name: rowToEdit.name,
+        order: rowToEdit.order.toString(),
+        start_date: rowToEdit.start_date?.slice(0, 16) ?? '',
+        duration: rowToEdit.duration.toString(),
+        location: rowToEdit.location,
+        capacity: rowToEdit.capacity.toString(),
+        day: rowToEdit.day.id.toString(), // 👈 .id porque ahora es objeto
+        activity_type: rowToEdit.activity_type.id.toString(), // 👈 .id
+        speaker: rowToEdit.speaker.id.toString(), // 👈 .id
       });
+      setEditErrors({});
     }
-  }, [selectedDayId, selectedActivityTypeId, selectedSpeakerId]);
+  }, [editOpen, rowToEdit]);
 
-  const filtered = activities.filter((a) =>
-    a.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const columns = getActivityColumns();
 
-  // Handlers editar
+  const fields = getActivityFields(days, speakers, activityTypes);
+
+  const handleEditSelectChange = (id: string, value: string) => {
+    setEditForm((prev) => ({ ...prev, [id]: value }));
+    setEditErrors((prev) => ({ ...prev, [id]: undefined }));
+  };
+
+  // Abre el modal de editar con la fila seleccionada
   const handleEditRequest = (row: Row) => {
-    const original = activities.find((a) => a.id === (row.id as number));
+    const original = activities.find((d) => d.id === (row.id as number));
     if (original) {
-      setRowToEdit(original);
+      setRowToEdit(original); // usa los datos originales (no formateados)
       setEditOpen(true);
     }
   };
@@ -155,10 +158,50 @@ const Activity = () => {
     }
   };
 
+  const handleEditOpen = (val: boolean) => {
+    setEditOpen(val);
+    if (!val) {
+      setEditForm(emptyForm);
+      setEditErrors({});
+    }
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setEditErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+  };
+
+  const handleEditSubmit = async () => {
+    if (!rowToEdit) return;
+    if (!validate(editForm, fields, setEditErrors)) return;
+    setEditLoading(true);
+    try {
+      await updateActivity(rowToEdit.id, formToPayload(editForm));
+      toast.success('Actividad actualizada correctamente.');
+      handleEditOpen(false);
+    } catch {
+      toast.error('Error al actualizar la actividad. Intenta nuevamente.');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleDeleteCancel = () => {
     setConfirmOpen(false);
     setRowToDelete(null);
   };
+
+  const filtered = activities.filter((d) => {
+    const matchSearch = d.name.toLowerCase().includes(search.toLowerCase());
+    const matchDay = selectedDayId ? d.day.id === selectedDayId : true;
+    const matchType = selectedActivityTypeId
+      ? d.activity_type.id === selectedActivityTypeId
+      : true;
+    const matchSpeaker = selectedSpeakerId
+      ? d.speaker.id === selectedSpeakerId
+      : true;
+    return matchSearch && matchDay && matchType && matchSpeaker;
+  });
 
   if (loading) return <LoadingControl />;
   if (error) return <p className='text-red-400 p-8'>{error}</p>;
@@ -174,11 +217,7 @@ const Activity = () => {
       <div className='rounded-2xl border border-white/10 bg-[#1a1a1a] shadow-xl'>
         <div className='flex flex-col gap-3 border-b border-white/10 px-6 py-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex flex-wrap items-center gap-2'>
-            <ActivityActionButtons
-              rowToEdit={rowToEdit}
-              editOpen={editOpen}
-              onEditOpenChange={setEditOpen}
-            />
+            <ActivityActionButtons />
             <ActivityFilters
               selectedDayId={selectedDayId}
               selectedActivityTypeId={selectedActivityTypeId}
@@ -205,7 +244,7 @@ const Activity = () => {
           )}
         </TablePanel>
 
-        <FooterPanel filtered={filtered.length} elements={activities.length} />
+        <FooterPanel filtered={filtered.length} elements={days.length} />
       </div>
 
       {/* Modal Eliminar */}
@@ -215,7 +254,23 @@ const Activity = () => {
         onConfirm={handleDeleteConfirm}
         loading={deleting}
         title='Eliminar actividad'
-        description={rowToDelete?.name as string}
+        description={rowToDelete?.title as string}
+      />
+
+      <ModalForm
+        mode='edit'
+        open={editOpen}
+        onOpenChange={handleEditOpen}
+        fields={fields}
+        form={editForm}
+        errors={editErrors}
+        onChange={handleEditChange}
+        onSubmit={handleEditSubmit}
+        loading={editLoading}
+        title='Editar Actividad'
+        description='Edita los campos de la actividad.'
+        icon={<Zap className='h-4 w-4 text-black' />}
+        onValueChange={handleEditSelectChange}
       />
 
       <Toaster position='bottom-right' richColors theme='dark' />

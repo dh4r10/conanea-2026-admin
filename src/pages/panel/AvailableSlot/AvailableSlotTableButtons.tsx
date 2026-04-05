@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
-import type { Activities } from '@/types/activities.types';
+import type { AvailableSlots } from '@/types/availableSlots.types';
 
-interface ActivityTableButtonsProps {
-  row: Activities;
-  onEdit?: (row: Activities) => void;
-  onDelete?: (row: Activities) => void;
+interface AvailableSlotTableButtonsProps {
+  row: AvailableSlots;
+  onEdit?: (row: AvailableSlots) => void;
+  onDelete?: (row: AvailableSlots) => void;
 }
 
-const ActivityTableButtons = ({
+const AvailableSlotTableButtons = ({
   row,
   onEdit,
   onDelete,
-}: ActivityTableButtonsProps) => {
+}: AvailableSlotTableButtonsProps) => {
   return (
     <div className='flex items-center justify-end gap-1'>
       <Button
@@ -35,4 +35,4 @@ const ActivityTableButtons = ({
   );
 };
 
-export default ActivityTableButtons;
+export default AvailableSlotTableButtons;

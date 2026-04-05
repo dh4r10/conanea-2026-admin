@@ -1,58 +1,50 @@
 import { useState } from 'react';
 
-import { Plus, Zap } from 'lucide-react';
+import { Plus, Ticket } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import ModalForm from '../components/modals/ModalForm';
 
-import { useActivityStore } from '@/store/useActivityStore';
-import { useDayStore } from '@/store/useDayStore';
-import { useActivityTypeStore } from '@/store/useActivityTypeStore';
-import { useSpeakerStore } from '@/store/useSpeakerStore';
+import { useAvailableSlotStore } from '@/store/useAvailableSlotStore';
+import { usePreSaleStore } from '@/store/usePreSaleStore';
+import { useQuotaTypeStore } from '@/store/useQuotaTypeStore';
 
 import {
-  type ActivityForm,
+  type AvailableSlotForm,
   type FormErrors,
-  type ActivityPayload,
+  type AvailableSlotPayload,
   emptyForm,
-} from './activity.types';
+} from './availableSlot.types';
 
-import { getActivityFields } from './fields';
+import { getAvailableSlotFields } from './fields';
 import { validate } from '@/utils/validations';
 
 import { toast } from 'sonner'; // 👈 agregar
 
-const formToPayload = (form: ActivityForm): ActivityPayload => ({
-  name: form.name,
-  order: Number(form.order),
-  start_date: form.start_date,
-  duration: Number(form.duration),
-  location: form.location,
-  capacity: Number(form.capacity),
-  day: Number(form.day),
-  activity_type: Number(form.activity_type),
-  speaker: Number(form.speaker),
+const formToPayload = (form: AvailableSlotForm): AvailableSlotPayload => ({
+  pre_sale: Number(form.pre_sale),
+  quota_type: Number(form.quota_type),
+  mount: Number(form.mount),
+  amount: Number(form.amount),
 });
 
-const ActivityTypeActionButtons = () => {
-  const { createActivity } = useActivityStore();
+const AvailableSlotActionButtons = () => {
+  const { createAvailableSlot } = useAvailableSlotStore();
 
-  const { days } = useDayStore();
+  const { preSales } = usePreSaleStore();
 
-  const { activityTypes } = useActivityTypeStore();
-
-  const { speakers } = useSpeakerStore();
+  const { quotaTypes } = useQuotaTypeStore();
 
   // Modal Crear
   const [createOpen, setCreateOpen] = useState(false);
 
-  const [createForm, setCreateForm] = useState<ActivityForm>(emptyForm);
+  const [createForm, setCreateForm] = useState<AvailableSlotForm>(emptyForm);
 
   const [createErrors, setCreateErrors] = useState<FormErrors>({});
 
   const [createLoading, setCreateLoading] = useState(false);
 
-  const fields = getActivityFields(days, speakers, activityTypes);
+  const fields = getAvailableSlotFields(preSales, quotaTypes);
 
   // Handlers Crear
   const handleCreateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,12 +56,12 @@ const ActivityTypeActionButtons = () => {
     if (!validate(createForm, fields, setCreateErrors)) return;
     setCreateLoading(true);
     try {
-      await createActivity(formToPayload(createForm));
-      toast.success('Actividad creada correctamente.'); // 👈
+      await createAvailableSlot(formToPayload(createForm));
+      toast.success('Cupo creado correctamente.'); // 👈
       setCreateForm(emptyForm);
       setCreateOpen(false);
     } catch {
-      toast.error('Error al crear la actividad. Intenta nuevamente.'); // 👈
+      toast.error('Error al crear el cupo. Intenta nuevamente.'); // 👈
     } finally {
       setCreateLoading(false);
     }
@@ -111,13 +103,13 @@ const ActivityTypeActionButtons = () => {
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
         loading={createLoading}
-        title='Nueva Actividad'
+        title='Nuevo Cupo'
         description='Completa los campos.'
-        icon={<Zap className='h-4 w-4 text-black' />}
+        icon={<Ticket className='h-4 w-4 text-black' />}
         onValueChange={handleCreateSelectChange}
       />
     </div>
   );
 };
 
-export default ActivityTypeActionButtons;
+export default AvailableSlotActionButtons;

@@ -192,8 +192,8 @@ const QuotaType = () => {
         onChange={handleEditChange}
         onSubmit={handleEditSubmit}
         loading={editLoading}
-        title='Nuevo tipo de cuota'
-        description='Completa los campos.'
+        title='Editar tipo de cuota'
+        description='Edita los campos del tipo de cuota.'
         icon={<DollarSign className='h-4 w-4 text-black' />}
       />
 

@@ -212,8 +212,8 @@ const Speaker = () => {
         onChange={handleEditChange}
         onSubmit={handleEditSubmit}
         loading={editLoading}
-        title='Nuevo Speaker'
-        description='Completa los campos.'
+        title='Editar Speaker'
+        description='Edita los campos del speaker.'
         currentPhoto={rowToEdit?.photo ?? undefined}
         icon={<Mic2 className='h-4 w-4 text-black' />}
       />
