@@ -32,7 +32,7 @@ export type PaginationMeta = {
 interface TablePanelProps {
   columns: Column[];
   data: Row[];
-  children: (row: Row) => React.ReactNode;
+  children?: (row: Row) => React.ReactNode;
   pagination?: PaginationMeta; // 👈 opcional — si no se pasa, funciona igual que antes
 }
 
@@ -72,9 +72,11 @@ const TablePanel = ({
                 {col.label}
               </TableHead>
             ))}
-            <TableHead className='text-xs font-semibold uppercase tracking-wider text-slate-500 text-right'>
-              Acciones
-            </TableHead>
+            {children && (
+              <TableHead className='text-xs font-semibold uppercase tracking-wider text-slate-500 text-right'>
+                Acciones
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
 
@@ -110,7 +112,9 @@ const TablePanel = ({
                       : String(row[col.key] ?? '—')}
                   </TableCell>
                 ))}
-                <TableCell className='text-right'>{children(row)}</TableCell>
+                {children && (
+                  <TableCell className='text-right'>{children(row)}</TableCell>
+                )}
               </TableRow>
             ))
           )}

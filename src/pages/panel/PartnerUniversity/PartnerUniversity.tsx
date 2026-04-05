@@ -4,7 +4,7 @@ import { University } from 'lucide-react';
 
 import HeaderPanel from '../components/HeaderPanel';
 import TablePanel from '../components/TablePanel';
-import FooterPanel from '../components/FooterPanel';
+// import FooterPanel from '../components/FooterPanel';
 import SearchPanel from '../components/SearchPanel';
 import LoadingControl from '@/components/LoadingControl';
 
@@ -263,10 +263,10 @@ const PartnerUniversity = () => {
           )}
         </TablePanel>
 
-        <FooterPanel
+        {/* <FooterPanel
           filtered={meta?.count ?? universities.length}
           elements={meta?.count ?? universities.length}
-        />
+        /> */}
       </div>
 
       {/* Modal Eliminar */}

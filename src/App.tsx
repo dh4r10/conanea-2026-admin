@@ -18,8 +18,10 @@ import PreSale from './pages/panel/PreSale';
 import QuotaType from './pages/panel/QuotaType';
 import AvailableSlot from './pages/panel/AvailableSlot';
 
-import './App.css';
 import PartnerUniversity from './pages/panel/PartnerUniversity';
+import DynamicCode from './pages/panel/DynamicCode';
+
+import './App.css';
 
 function App() {
   useScrollToTop();
@@ -42,7 +44,9 @@ function App() {
           <Route path='/quota-type' element={<QuotaType />} />
           <Route path='/pre-sale' element={<PreSale />} />
           <Route path='/available-slot' element={<AvailableSlot />} />
+
           <Route path='/partner-university' element={<PartnerUniversity />} />
+          <Route path='/dynamic-code' element={<DynamicCode />} />
 
           <Route path='/change-password' element={<ChangePassword />} />
         </Route>

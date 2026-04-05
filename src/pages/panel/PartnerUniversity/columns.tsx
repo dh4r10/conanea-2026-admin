@@ -18,7 +18,9 @@ export const columns = [
     label: 'Código',
     key: 'code',
     render: (value: unknown) => (
-      <span className='text-slate-200 text-sm'>{value as string}</span>
+      <span className='font-mono text-[#fbba0e] text-sm'>
+        {value as string}
+      </span>
     ),
   },
   {
