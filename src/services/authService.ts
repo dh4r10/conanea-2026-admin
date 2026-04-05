@@ -41,4 +41,12 @@ export const authService = {
       return false;
     }
   },
+
+  changePassword: async (current_password: string, new_password: string) => {
+    const { data } = await api.post('/security/change-password/', {
+      current_password,
+      new_password,
+    });
+    return data;
+  },
 };

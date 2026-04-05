@@ -51,7 +51,7 @@ const FormFile = ({
   return (
     <div className='flex flex-col gap-2'>
       <Label className='text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5'>
-        <Camera className='h-3 w-3' />
+        <Camera className='text-[#fbba0e] size-3 mb-px' />
         {label}
       </Label>
 

@@ -18,7 +18,7 @@ import DayTableButtons from './DayTableButtons';
 import ModalDelete from '../components/modals/ModalDelete';
 import ModalForm from '../components/modals/ModalForm';
 
-import { columns } from './columns';
+import { getDayColumns } from './columns';
 import { fields } from './fields';
 import { validate } from '@/utils/validations';
 
@@ -46,6 +46,8 @@ const Day = () => {
   });
   const [editErrors, setEditErrors] = useState<FormErrors>({});
   const [editLoading, setEditLoading] = useState(false);
+
+  const columns = getDayColumns();
 
   useEffect(() => {
     fetchDays();

@@ -14,12 +14,14 @@ import {
   LayoutDashboard,
   Settings,
   LogOut,
-  User,
+  // User,
   PanelBottomOpen,
   CalendarDays,
   Brackets,
   Mic2,
   ActivityIcon,
+  DollarSign,
+  ChartSpline,
 } from 'lucide-react';
 
 import {
@@ -31,11 +33,27 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export function AppSidebar() {
-  const user = {
-    name: 'Jhosep Gómez',
-    email: 'jhosep@gmail.com',
+  const { user, logout } = useAuthStore();
+
+  const formatName = (first: string, surname: string) => {
+    const firstName = first.trim().split(' ')[0]; // solo el primer nombre
+    const capitalize = (s: string) =>
+      s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    return `${capitalize(firstName)} ${capitalize(surname)}`;
+  };
+
+  const displayName = user
+    ? formatName(user.first_name ?? '', user.paternal_surname ?? '')
+    : '';
+
+  const displayUsername = user?.username ?? '';
+
+  const userFormated = {
+    name: displayName,
+    username: displayUsername,
     avatar: '', // URL si tienes
   };
 
@@ -118,6 +136,30 @@ export function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className=' text-[#fbba0e]'>
+            Registro
+          </SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <Link to='/pre-sale'>
+                <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
+                  <ChartSpline className='w-4 h-4' />
+                  <span>Pre-venta</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <Link to='/quota-type'>
+                <SidebarMenuButton className='cursor-pointer hover:bg-[#fbba0e]/90 transition'>
+                  <DollarSign className='w-4 h-4' />
+                  <span>Tipos de Cuota</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
 
       {/* FOOTER PRO */}
@@ -127,17 +169,19 @@ export function AppSidebar() {
             <div className='flex items-center justify-between cursor-pointer rounded-xl p-2 hover:bg-[#111]'>
               <div className='flex items-center gap-3'>
                 <Avatar className='w-9 h-9'>
-                  <AvatarImage src={user.avatar} />
+                  <AvatarImage src={userFormated.avatar} />
                   <AvatarFallback className='bg-[#fbba0e] text-black'>
-                    {user.name.charAt(0)}
+                    {userFormated.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className='flex flex-col text-sm leading-tight'>
                   <span className='font-medium text-[#fbba0e]'>
-                    {user.name}
+                    {userFormated.name}
                   </span>
-                  <span className='text-xs text-slate-200'>{user.email}</span>
+                  <span className='text-xs text-slate-200'>
+                    {userFormated.username}
+                  </span>
                 </div>
               </div>
 
@@ -153,17 +197,22 @@ export function AppSidebar() {
             align='end'
             className='w-48 bg-[#111] text-slate-200 border border-white/10 '
           >
-            <DropdownMenuItem className='cursor-pointer hover:bg-[#fbba0e]/90 transition hover:text-black'>
+            {/* <DropdownMenuItem className='cursor-pointer hover:bg-[#fbba0e]/90 transition hover:text-black'>
               <User className='w-4 h-4 mr-2' />
               Perfil
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
 
-            <DropdownMenuItem className='cursor-pointer hover:bg-[#fbba0e]/90 transition hover:text-black'>
-              <Settings className='w-4 h-4 mr-2' />
-              Configuración
-            </DropdownMenuItem>
+            <Link to='/change-password'>
+              <DropdownMenuItem className='cursor-pointer hover:bg-[#fbba0e]/90 transition hover:text-black'>
+                <Settings className='w-4 h-4 mr-2' />
+                Configuración
+              </DropdownMenuItem>
+            </Link>
 
-            <DropdownMenuItem className='text-red-500 cursor-pointer  hover:text-red-400 transition'>
+            <DropdownMenuItem
+              className='text-red-500 cursor-pointer  hover:text-red-400 transition'
+              onClick={logout}
+            >
               <LogOut className='w-4 h-4 mr-2' />
               Cerrar sesión
             </DropdownMenuItem>

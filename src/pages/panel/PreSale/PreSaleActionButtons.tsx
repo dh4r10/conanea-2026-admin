@@ -1,34 +1,25 @@
 import { useState } from 'react';
 
-import { Plus, Mic2 } from 'lucide-react';
+import { Plus, ChartSpline } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import ModalForm from '../components/modals/ModalForm';
 
-import { useSpeakerStore } from '@/store/useSpeakerStore';
-import { type SpeakerForm, type FormErrors, emptyForm } from './speaker.types';
+import { usePreSaleStore } from '@/store/usePreSaleStore';
+import { type PreSaleForm, type FormErrors, emptyForm } from './preSale.types';
 
 import { fields } from './fields';
 import { validate } from '@/utils/validations';
 
 import { toast } from 'sonner'; // 👈 agregar
 
-const buildFormData = (form: SpeakerForm): FormData => {
-  const fd = new FormData();
-  fd.append('name', form.name);
-  fd.append('title', form.title);
-  fd.append('bio', form.bio);
-  if (form.photo) fd.append('photo', form.photo);
-  return fd;
-};
-
-const ActivityTypeActionButtons = () => {
-  const { createSpeaker } = useSpeakerStore();
+const PreSaleActionButtons = () => {
+  const { createPreSale } = usePreSaleStore();
 
   // Modal Crear
   const [createOpen, setCreateOpen] = useState(false);
 
-  const [createForm, setCreateForm] = useState<SpeakerForm>(emptyForm);
+  const [createForm, setCreateForm] = useState<PreSaleForm>(emptyForm);
 
   const [createErrors, setCreateErrors] = useState<FormErrors>({});
 
@@ -41,15 +32,19 @@ const ActivityTypeActionButtons = () => {
   };
 
   const handleCreateSubmit = async () => {
-    if (!validate(createForm, fields, setCreateErrors, 'create')) return;
+    if (!validate(createForm, fields, setCreateErrors)) return;
     setCreateLoading(true);
     try {
-      await createSpeaker(buildFormData(createForm));
-      toast.success('Speaker creado correctamente.'); // 👈
+      await createPreSale({
+        name: createForm.name,
+        start_date: createForm.start_date,
+        end_date: createForm.end_date,
+      });
+      toast.success('Preventa creada correctamente.'); // 👈
       setCreateForm(emptyForm);
       setCreateOpen(false);
     } catch {
-      toast.error('Error al crear el speaker. Intenta nuevamente.'); // 👈
+      toast.error('Error al crear la preventa. Intenta nuevamente.'); // 👈
     } finally {
       setCreateLoading(false);
     }
@@ -61,11 +56,6 @@ const ActivityTypeActionButtons = () => {
       setCreateForm(emptyForm);
       setCreateErrors({});
     }
-  };
-
-  const handleEditFile = (id: string, file: File | null) => {
-    setCreateForm((prev) => ({ ...prev, [id]: file }));
-    setCreateErrors((prev) => ({ ...prev, [id]: undefined }));
   };
 
   return (
@@ -86,18 +76,17 @@ const ActivityTypeActionButtons = () => {
         open={createOpen}
         onOpenChange={handleCreateOpenChange}
         fields={fields}
-        onFile={handleEditFile}
         form={createForm}
         errors={createErrors}
         onChange={handleCreateChange}
         onSubmit={handleCreateSubmit}
         loading={createLoading}
-        title='Nuevo Speaker'
+        title='Nueva Preventa'
         description='Completa los campos.'
-        icon={<Mic2 className='h-4 w-4 text-black' />}
+        icon={<ChartSpline className='h-4 w-4 text-black' />}
       />
     </div>
   );
 };
 
-export default ActivityTypeActionButtons;
+export default PreSaleActionButtons;

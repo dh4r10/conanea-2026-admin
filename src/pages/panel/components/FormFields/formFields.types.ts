@@ -10,6 +10,7 @@ interface Field {
   options?: { label: string; value: string }[];
   fullWidth?: boolean;
   required?: boolean;
+  requiredOnCreate?: boolean;
   condition?: (form: Record<string, unknown>, currentPhoto?: string) => boolean;
 }
 

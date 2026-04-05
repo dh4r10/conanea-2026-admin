@@ -5,7 +5,8 @@ export const fields: Field[] = [
     kind: 'photo',
     id: 'photo',
     fullWidth: true,
-    condition: (_form, currentPhoto) => !!currentPhoto, // 👈 depende de currentPhoto
+    requiredOnCreate: true,
+    condition: (_form, currentPhoto) => !!currentPhoto,
   },
   {
     kind: 'input',
@@ -37,7 +38,7 @@ export const fields: Field[] = [
     id: 'photo',
     label: 'Foto',
     fullWidth: true,
-    required: true,
+    requiredOnCreate: true,
     condition: (_form, currentPhoto) => !currentPhoto, // 👈
   },
 ];

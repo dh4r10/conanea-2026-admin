@@ -4,11 +4,18 @@ export const validate = <T extends Record<string, unknown>>(
   form: T,
   fields: Field[],
   setErrors: (errors: Partial<Record<keyof T, string>>) => void,
+  mode: 'create' | 'edit' = 'create', // 👈
 ): boolean => {
   const errors: Partial<Record<keyof T, string>> = {};
 
   fields.forEach((field) => {
-    if (!field.id || !field.required) return;
+    if (!field.id) return;
+
+    const isRequired =
+      field.required || (mode === 'create' && field.requiredOnCreate); // 👈
+
+    if (!isRequired) return;
+
     const value = form[field.id];
 
     if (typeof value === 'string' && !value.trim()) {
